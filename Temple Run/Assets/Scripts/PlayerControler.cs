@@ -10,13 +10,14 @@ namespace TempleRun.Player
     [RequireComponent(typeof(CharacterController), typeof(PlayerInput), typeof(Animator))]
     public class PlayerControler : MonoBehaviour
     {
-        [SerializeField] private float initialPlayerSpeed = 8f;
-        [SerializeField] private float maxPlayerSpeed = 60f;
+        [SerializeField] private float initialPlayerSpeed = 4f;
+        [SerializeField] private float maxPlayerSpeed = 30f;
         [SerializeField] private float playerSpeedIncrease = 0.1f;
         [SerializeField] private float playerJumpHeight = 1f;
         [SerializeField] private float initialGravity = -9.81f;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask turnLayer;
+        [SerializeField] private AnimationClip slideAnimation;
 
         private float playerSpeed;
         private float playerGravity;
@@ -114,10 +115,29 @@ namespace TempleRun.Player
 
         private void PlayerSlide(InputAction.CallbackContext context)
         {
-            if(!sliding && isGrounded())
+            if (!sliding && isGrounded())
             {
-                //StartCoroutine(Slide());
+                StartCoroutine(Slide());
             }
+        }
+
+        private IEnumerator Slide()
+        {
+            sliding = true;
+            // Collider mas pequeño
+            Vector3 originalControllerCenter = characterController.center;
+            Vector3 newControllerCenter = originalControllerCenter;
+            characterController.height /= 2;
+            newControllerCenter.y -= characterController.height / 2;
+            characterController.center = newControllerCenter;
+
+            animator.Play(slideAnimationHash);
+            yield return new WaitForSeconds(slideAnimation.length);
+
+            // Collider normal
+            characterController.height *= 2;
+            characterController.center = originalControllerCenter;
+            sliding = false;
         }
 
         private void Update()
@@ -133,15 +153,18 @@ namespace TempleRun.Player
             characterController.Move(playerVelocity * Time.deltaTime);
         }
 
-        private bool isGrounded(float length = 0.2f)
+        private bool isGrounded(float length = .2f)
         {
             Vector3 raycastOriginFirst = transform.position;
-            raycastOriginFirst.y -= characterController.height / 2;
+            raycastOriginFirst.y -= characterController.height - 3.2f;
             raycastOriginFirst.y += 0.1f;
 
             Vector3 raycastOriginSecond = raycastOriginFirst;
-            raycastOriginFirst -= transform.forward * 2f;
-            raycastOriginSecond -= transform.forward * -2f;
+            raycastOriginFirst -= transform.forward * .2f;
+            raycastOriginSecond -= transform.forward * -.2f;
+
+            Debug.DrawRay(raycastOriginFirst, Vector3.down * length, Color.red);
+            Debug.DrawRay(raycastOriginSecond, Vector3.down * length, Color.red);
 
             if (Physics.Raycast(raycastOriginFirst, Vector3.down, out RaycastHit hit, length, groundLayer) || Physics.Raycast(raycastOriginSecond, Vector3.down, out hit, length, groundLayer))
             {
