@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 namespace TempleRun.Player
 {
@@ -10,10 +11,10 @@ namespace TempleRun.Player
     [RequireComponent(typeof(CharacterController), typeof(PlayerInput), typeof(Animator))]
     public class PlayerControler : MonoBehaviour
     {
-        [SerializeField] private float initialPlayerSpeed = 4f;
-        [SerializeField] private float maxPlayerSpeed = 30f;
+        [SerializeField] private float initialPlayerSpeed = 8f;
+        [SerializeField] private float maxPlayerSpeed = 60f;
         [SerializeField] private float playerSpeedIncrease = 0.1f;
-        [SerializeField] private float playerJumpHeight = 1f;
+        [SerializeField] private float playerJumpHeight = 2f;
         [SerializeField] private float initialGravity = -9.81f;
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask turnLayer;
@@ -71,6 +72,7 @@ namespace TempleRun.Player
         {
             Vector3? turnPos = checkTurn(context.ReadValue<float>());
             if (turnPos == null) return;
+
             Vector3 targetDirection = Quaternion.AngleAxis(90 * context.ReadValue<float>(), Vector3.up) * playerDirection;
             turnEvent.Invoke(targetDirection);
             Turn(context.ReadValue<float>(), turnPos.Value);
@@ -78,11 +80,6 @@ namespace TempleRun.Player
 
         private void Turn(float turnValue, Vector3 turnPos)
         {
-            Vector3 tmpPlayerPos = new Vector3(turnPos.x, transform.position.y, turnPos.z);
-            characterController.enabled = false;
-            transform.position = tmpPlayerPos;
-            characterController.enabled = true;
-
             transform.rotation = transform.rotation * Quaternion.Euler(0, 90 * turnValue, 0);
             playerDirection = transform.forward.normalized;
         }
@@ -151,6 +148,18 @@ namespace TempleRun.Player
 
             playerVelocity.y += playerGravity * Time.deltaTime;
             characterController.Move(playerVelocity * Time.deltaTime);
+
+            float horizontalInput = PlayerInput.actions["Turn"].ReadValue<float>();
+            if (horizontalInput < 0) // mover izquierda
+            {
+                Vector3 leftMovement = transform.right * -1 * playerSpeed * Time.deltaTime;
+                characterController.Move(leftMovement);
+            }
+            else if (horizontalInput > 0) // mover derecha
+            {
+                Vector3 rightMovement = transform.right * playerSpeed * Time.deltaTime;
+                characterController.Move(rightMovement);
+            }
         }
 
         private bool isGrounded(float length = .2f)
