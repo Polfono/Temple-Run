@@ -88,7 +88,7 @@ public class TileSpawner : MonoBehaviour
 
         private void SpawnObstacle ()
         {
-            if (Random.value > 0.2f) return;
+            if (Random.value > 0.4f) return;
 
             GameObject obstacle = RandomGameObjectFromList(obstacles);
             Quaternion obstacleRotation = obstacle.gameObject.transform.rotation * Quaternion.LookRotation(currentTileDirection, Vector3.up);

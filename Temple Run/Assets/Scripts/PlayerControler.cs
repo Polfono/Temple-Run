@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using UnityEngine.Events;
 using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 namespace TempleRun.Player
@@ -19,6 +18,7 @@ namespace TempleRun.Player
         [SerializeField] private LayerMask groundLayer;
         [SerializeField] private LayerMask turnLayer;
         [SerializeField] private AnimationClip slideAnimation;
+        [SerializeField] private AnimationClip jumpAnimation;
 
         private float playerSpeed;
         private float playerGravity;
@@ -33,6 +33,7 @@ namespace TempleRun.Player
         private int slideAnimationHash;
         private int jumpAnimationHash;
         private Animator animator;
+        bool transToSlide = false;
 
         [SerializeField] private UnityEvent<Vector3> turnEvent;
 
@@ -68,14 +69,25 @@ namespace TempleRun.Player
             playerSpeed = initialPlayerSpeed;
         }
 
+        private bool canTurn = true;
+
         private void PlayerTurn(InputAction.CallbackContext context)
         {
             Vector3? turnPos = checkTurn(context.ReadValue<float>());
-            if (turnPos == null) return;
+            if (turnPos == null || !canTurn) return;
 
             Vector3 targetDirection = Quaternion.AngleAxis(90 * context.ReadValue<float>(), Vector3.up) * playerDirection;
             turnEvent.Invoke(targetDirection);
             Turn(context.ReadValue<float>(), turnPos.Value);
+
+            StartCoroutine(ResetTurnCooldown());
+        }
+
+        private IEnumerator ResetTurnCooldown()
+        {
+            canTurn = false;
+            yield return new WaitForSeconds(1f);
+            canTurn = true;
         }
 
         private void Turn(float turnValue, Vector3 turnPos)
@@ -102,11 +114,13 @@ namespace TempleRun.Player
 
         private void PlayerJump(InputAction.CallbackContext context)
         {
-            if (isGrounded())
+            if (isGrounded() || sliding)
             {
                 animator.Play(jumpAnimationHash);
                 playerVelocity.y = Mathf.Sqrt(playerJumpHeight * -3f * playerGravity);
                 characterController.Move(playerVelocity * Time.deltaTime);
+
+                if(sliding) sliding = false;
             }
         }
 
@@ -115,6 +129,11 @@ namespace TempleRun.Player
             if (!sliding && isGrounded())
             {
                 StartCoroutine(Slide());
+            }
+            else if(!sliding)
+            {
+                playerGravity = initialGravity * 10f;
+                transToSlide = true;
             }
         }
 
@@ -144,21 +163,33 @@ namespace TempleRun.Player
             if (isGrounded() && playerVelocity.y < 0)
             {
                 playerVelocity.y = 0f;
+                if (transToSlide)
+                {
+                    StartCoroutine(Slide());
+                    transToSlide = false;
+                    playerGravity = initialGravity;
+                }
             }
 
             playerVelocity.y += playerGravity * Time.deltaTime;
             characterController.Move(playerVelocity * Time.deltaTime);
 
             float horizontalInput = PlayerInput.actions["Turn"].ReadValue<float>();
-            if (horizontalInput < 0) // mover izquierda
+            if (horizontalInput < 0 && canTurn) // mover izquierda
             {
-                Vector3 leftMovement = transform.right * -1 * playerSpeed * Time.deltaTime;
+                Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
                 characterController.Move(leftMovement);
             }
-            else if (horizontalInput > 0) // mover derecha
+            else if (horizontalInput > 0 && canTurn) // mover derecha
             {
-                Vector3 rightMovement = transform.right * playerSpeed * Time.deltaTime;
+                Vector3 rightMovement = transform.right * 0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the right
                 characterController.Move(rightMovement);
+            }
+
+            if (playerSpeed < maxPlayerSpeed)
+            {
+                playerSpeed += playerSpeedIncrease * Time.deltaTime;
+                //playerGravity = initialGravity - playerSpeed;
             }
         }
 
