@@ -7,10 +7,11 @@ namespace TempleRun {
 
 public class TileSpawner : MonoBehaviour
 {
-        [SerializeField] private int tilesStart = 10;
+        [SerializeField] private int tilesStart = 7;
         [SerializeField] private int minStraightTiles = 3;
         [SerializeField] private int maxStraightTiles = 15;
         [SerializeField] private GameObject startingTile;
+        [SerializeField] private List<GameObject> straightTiles;
         [SerializeField] private List<GameObject> turnTiles;
         [SerializeField] private List<GameObject> obstacles;
 
@@ -28,9 +29,10 @@ public class TileSpawner : MonoBehaviour
 
             Random.InitState(System.DateTime.Now.Millisecond);
 
+            SpawnTile(startingTile.GetComponent<Tile>());
             for (int i = 0; i < tilesStart; i++)
             {
-                SpawnTile(startingTile.GetComponent<Tile>());
+                SpawnTile(RandomGameObjectFromList(straightTiles).GetComponent<Tile>());
             }
 
             SpawnTile(RandomGameObjectFromList(turnTiles).GetComponent<Tile>());
@@ -78,9 +80,11 @@ public class TileSpawner : MonoBehaviour
 
             currentTileLocation += tilePlacementScale;
             int currentPathLenght = Random.Range(minStraightTiles, maxStraightTiles);
+
+            SpawnTile(startingTile.GetComponent<Tile>());
             for (int i = 0; i < currentPathLenght; i++)
             {
-                SpawnTile(startingTile.GetComponent<Tile>(), (i == 0) ? false : true);
+                SpawnTile(RandomGameObjectFromList(straightTiles).GetComponent<Tile>(), (i == 0) ? false : true);
             }
 
             SpawnTile(RandomGameObjectFromList(turnTiles).GetComponent<Tile>());
