@@ -189,6 +189,7 @@ namespace TempleRun.Player
             if (playerSpeed < maxPlayerSpeed)
             {
                 playerSpeed += playerSpeedIncrease * Time.deltaTime;
+                // HAY Q ARREGLAR ESTO
                 //playerGravity = initialGravity - playerSpeed;
             }
         }

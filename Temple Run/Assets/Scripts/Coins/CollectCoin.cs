@@ -9,6 +9,7 @@ public class CollectCoin : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         coinFX.Play();
+        ControlCoin.coinCount++;
         Destroy(gameObject);
     }
 }
