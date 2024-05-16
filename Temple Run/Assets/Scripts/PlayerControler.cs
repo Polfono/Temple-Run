@@ -2,7 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
+using System.Threading.Tasks;
+
 
 namespace TempleRun.Player
 {
@@ -19,6 +20,7 @@ namespace TempleRun.Player
         [SerializeField] private LayerMask turnLayer;
         [SerializeField] private AnimationClip slideAnimation;
         [SerializeField] private AnimationClip jumpAnimation;
+        [SerializeField] private LayerMask obstacleLayer;
 
         private float playerSpeed;
         private float playerGravity;
@@ -32,10 +34,15 @@ namespace TempleRun.Player
         private bool sliding = false;
         private int slideAnimationHash;
         private int jumpAnimationHash;
+        private int dieAnimationHash;
         private Animator animator;
         bool transToSlide = false;
+        private float score = 0;
+        private bool isDead = false;
 
         [SerializeField] private UnityEvent<Vector3> turnEvent;
+        [SerializeField] private UnityEvent<int> gameOverEvent;
+        [SerializeField] private UnityEvent<int> scoreUpdateEvent;
 
         private void Awake()
         {
@@ -44,6 +51,7 @@ namespace TempleRun.Player
             animator = GetComponent<Animator>();
             slideAnimationHash = Animator.StringToHash("Slide");
             jumpAnimationHash = Animator.StringToHash("Jump");
+            dieAnimationHash = Animator.StringToHash("Die");
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
@@ -158,6 +166,18 @@ namespace TempleRun.Player
 
         private void Update()
         {
+            // si el jugador esta a menos de 0 de altura game over
+            if (transform.position.y < 0)
+            {
+                GameOver();
+                return;
+            }
+
+            // Score Update
+            if (!isDead) score += 10 * Time.deltaTime;
+            scoreUpdateEvent.Invoke((int)score);
+
+
             characterController.Move(transform.forward * playerSpeed * Time.deltaTime);
 
             if (isGrounded() && playerVelocity.y < 0)
@@ -172,7 +192,8 @@ namespace TempleRun.Player
             }
 
             playerVelocity.y += playerGravity * Time.deltaTime;
-            characterController.Move(playerVelocity * Time.deltaTime);
+            // only if controller active
+            if (characterController.enabled) characterController.Move(playerVelocity * Time.deltaTime);
 
             float horizontalInput = PlayerInput.actions["Turn"].ReadValue<float>();
             if (horizontalInput < 0 && canTurn) // mover izquierda
@@ -212,6 +233,29 @@ namespace TempleRun.Player
                 return true;
             }
             return false;
+        }
+
+        private async Task GameOver()
+        {
+         
+            animator.Play(dieAnimationHash);
+
+            // stop updating score and speed = 0 and stop getting input
+            scoreUpdateEvent.RemoveAllListeners();
+            playerSpeed = 0f;
+            PlayerInput.enabled = false;
+            isDead = true;
+
+            await Task.Delay(1000); // Delay for 1 second
+            gameOverEvent.Invoke((int)score);
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0)
+            {
+                GameOver();
+            }
         }
     }
 
