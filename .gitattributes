@@ -1,0 +1,2 @@
+*.fbx filter=lfs diff=lfs merge=lfs -text
+Temple[[:space:]]Run/Assets/Models/Zombie/Ch10_nonPBR@Zombie[[:space:]]Run.fbx filter=lfs diff=lfs merge=lfs -text
