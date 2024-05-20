@@ -26,6 +26,8 @@ namespace TempleRun.Player
         [SerializeField] private AudioClip fallingClip;
         [SerializeField] private AudioClip dieClip;
         [SerializeField] private AudioClip tropezarClip;
+        [SerializeField] private AudioClip jumpClip;
+        [SerializeField] private AudioClip slideClip;
 
         private float playerSpeed;
         private float playerGravity;
@@ -132,6 +134,9 @@ namespace TempleRun.Player
         {
             if (isGrounded() || sliding)
             {
+                audioSource.clip = jumpClip;
+                audioSource.pitch = 1.0f;
+                audioSource.Play();
                 animator.Play(jumpAnimationHash);
                 playerVelocity.y = Mathf.Sqrt(playerJumpHeight * -3f * playerGravity);
                 characterController.Move(playerVelocity * Time.deltaTime);
@@ -155,6 +160,11 @@ namespace TempleRun.Player
 
         private IEnumerator Slide()
         {
+            audioSource.clip = slideClip;
+            audioSource.pitch = 1.3f;
+            audioSource.volume = 0.2f;
+            audioSource.Play();
+            audioSource.volume = 0.3f;
             sliding = true;
             // Collider mas pequeño
             Vector3 originalControllerCenter = characterController.center;
