@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Threading.Tasks;
+using UnityEditor;
 
 
 namespace TempleRun.Player
@@ -21,6 +22,10 @@ namespace TempleRun.Player
         [SerializeField] private AnimationClip slideAnimation;
         [SerializeField] private AnimationClip jumpAnimation;
         [SerializeField] private LayerMask obstacleLayer;
+        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioClip fallingClip;
+        [SerializeField] private AudioClip dieClip;
+        [SerializeField] private AudioClip tropezarClip;
 
         private float playerSpeed;
         private float playerGravity;
@@ -35,6 +40,7 @@ namespace TempleRun.Player
         private int slideAnimationHash;
         private int jumpAnimationHash;
         private int dieAnimationHash;
+        private int fallAnimationHash;
         private Animator animator;
         bool transToSlide = false;
         private float score = 0;
@@ -48,10 +54,12 @@ namespace TempleRun.Player
         {
             PlayerInput = GetComponent<PlayerInput>();
             characterController = GetComponent<CharacterController>();
+            audioSource = GetComponent<AudioSource>();
             animator = GetComponent<Animator>();
             slideAnimationHash = Animator.StringToHash("Slide");
             jumpAnimationHash = Animator.StringToHash("Jump");
             dieAnimationHash = Animator.StringToHash("Die");
+            fallAnimationHash = Animator.StringToHash("Falling");
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
@@ -169,8 +177,16 @@ namespace TempleRun.Player
             // si el jugador esta a menos de 0 de altura game over
             if (transform.position.y < 0)
             {
-                GameOver();
-                return;
+                if (transform.position.y > -0.1f) {
+                    animator.Play(fallAnimationHash);
+                    audioSource.pitch = 1.75f;
+                    audioSource.clip = fallingClip;
+                    audioSource.Play();
+                } 
+                if (transform.position.y < -10.3f) {
+                    _ = GameOver();
+                    return;
+                }
             }
 
             // Score Update
@@ -210,8 +226,6 @@ namespace TempleRun.Player
             if (playerSpeed < maxPlayerSpeed)
             {
                 playerSpeed += playerSpeedIncrease * Time.deltaTime;
-                // HAY Q ARREGLAR ESTO
-                //playerGravity = initialGravity - playerSpeed;
             }
         }
 
@@ -239,6 +253,11 @@ namespace TempleRun.Player
         {
          
             animator.Play(dieAnimationHash);
+            if (!isDead) {
+                audioSource.pitch = 1.0f;
+                audioSource.clip = dieClip;
+                audioSource.Play();
+            } 
 
             // stop updating score and speed = 0 and stop getting input
             scoreUpdateEvent.RemoveAllListeners();
@@ -250,12 +269,13 @@ namespace TempleRun.Player
             gameOverEvent.Invoke((int)score);
         }
 
-        private void OnControllerColliderHit(ControllerColliderHit hit)
+        private async void OnControllerColliderHit(ControllerColliderHit hit)
         {
             if (((1 << hit.collider.gameObject.layer) & obstacleLayer) != 0)
             {
-                GameOver();
+                _ = GameOver();
             }
+            await Task.Delay(0); // Delay for 1 second
         }
     }
 

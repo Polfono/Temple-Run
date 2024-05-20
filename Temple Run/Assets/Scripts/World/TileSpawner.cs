@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 
-namespace TempleRun {
-
-public class TileSpawner : MonoBehaviour
+namespace TempleRun
 {
+
+    public class TileSpawner : MonoBehaviour
+    {
         [SerializeField] private int tilesStart = 7;
         [SerializeField] private int minStraightTiles = 3;
         [SerializeField] private int maxStraightTiles = 15;
         [SerializeField] private GameObject startingTile;
-        [SerializeField] private List<GameObject> straightTiles;
         [SerializeField] private List<GameObject> turnTiles;
         [SerializeField] private List<GameObject> obstacles;
+        [SerializeField] private List<GameObject> gems;
+        [SerializeField] private List<GameObject> jumps;
 
         private Vector3 currentTileLocation = Vector3.zero;
         private Vector3 currentTileDirection = Vector3.forward;
@@ -21,32 +21,74 @@ public class TileSpawner : MonoBehaviour
 
         private List<GameObject> currentTiles;
         private List<GameObject> currentObstacles;
+        private List<GameObject> currentGems;
+        private List<GameObject> currentJumps;
 
         private void Start()
         {
             currentTiles = new List<GameObject>();
             currentObstacles = new List<GameObject>();
+            currentGems = new List<GameObject>();
+            currentJumps = new List<GameObject>();
 
             Random.InitState(System.DateTime.Now.Millisecond);
 
-            SpawnTile(startingTile.GetComponent<Tile>());
-            for (int i = 0; i < tilesStart; i++)
+            // Spawn the first straight tile without obstacle
+            for(int i = 0; i < 2; i++) SpawnTile(startingTile.GetComponent<Tile>(), false, false);
+
+            for (int i = 1; i < tilesStart - 1; i++)
             {
-                SpawnTile(RandomGameObjectFromList(straightTiles).GetComponent<Tile>());
+                SpawnRandomTile();
             }
 
+            // Spawn the last straight tile without obstacle
+            SpawnTile(startingTile.GetComponent<Tile>(), false);
+
+            // Spawn a turn tile
             SpawnTile(RandomGameObjectFromList(turnTiles).GetComponent<Tile>());
         }
 
-        private void SpawnTile(Tile tile, bool spawnObstacle = false)
+        private void SpawnTile(Tile tile, bool spawnObstacle = false, bool spawnGems = true)
         {
             Quaternion newTileRotation = tile.gameObject.transform.rotation * Quaternion.LookRotation(currentTileDirection, Vector3.up);
             prevTile = GameObject.Instantiate(tile.gameObject, currentTileLocation, newTileRotation);
             currentTiles.Add(prevTile);
 
-            if(spawnObstacle) SpawnObstacle();
+            if (tile.type == TileType.STRAIGHT)
+            {
+                if (spawnObstacle)
+                {
+                    SpawnObstacle();
+                }
+                else if (Random.value <= 0.5f && spawnGems)
+                {
+                    SpawnGems();
+                }
+                currentTileLocation += Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size, currentTileDirection);
+            }
+            else if (tile.type == TileType.JUMP)
+            {
+                currentTileLocation += Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size, currentTileDirection);
+            }
+        }
 
-            if (tile.type == TileType.STRAIGHT) currentTileLocation += Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size, currentTileDirection);
+        private void SpawnRandomTile()
+        {
+            if (Random.value <= 0.2f)
+            {
+                // Ensure a straight tile before a jump
+                SpawnTile(startingTile.GetComponent<Tile>(), false);
+                // 20% chance to spawn a jump tile without obstacle
+                SpawnTile(RandomGameObjectFromList(jumps).GetComponent<Tile>(), false);
+                // Ensure a straight tile after a jump
+                SpawnTile(startingTile.GetComponent<Tile>(), false);
+            }
+            else
+            {
+                // 80% chance to spawn a straight tile
+                bool spawnObstacle = Random.value <= 0.4f;
+                SpawnTile(startingTile.GetComponent<Tile>(), spawnObstacle);
+            }
         }
 
         private void DeletePreviousTiles()
@@ -62,6 +104,11 @@ public class TileSpawner : MonoBehaviour
             {
                 Destroy(obstacle);
             }
+
+            foreach (GameObject gem in currentGems)
+            {
+                Destroy(gem);
+            }
         }
 
         public void addNewDirection(Vector3 direction)
@@ -70,8 +117,9 @@ public class TileSpawner : MonoBehaviour
             DeletePreviousTiles();
 
             Vector3 tilePlacementScale;
-            if (prevTile.GetComponent<Tile>().type == TileType.SIDEWAYS) {
-                tilePlacementScale = Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size /2 + (Vector3.one * startingTile.GetComponent<BoxCollider>().bounds.size.z /2), currentTileDirection);
+            if (prevTile.GetComponent<Tile>().type == TileType.SIDEWAYS)
+            {
+                tilePlacementScale = Vector3.Scale(prevTile.GetComponent<Renderer>().bounds.size / 2 + (Vector3.one * startingTile.GetComponent<BoxCollider>().bounds.size.z / 2), currentTileDirection);
             }
             else
             {
@@ -79,25 +127,39 @@ public class TileSpawner : MonoBehaviour
             }
 
             currentTileLocation += tilePlacementScale;
-            int currentPathLenght = Random.Range(minStraightTiles, maxStraightTiles);
+            int currentPathLength = Random.Range(minStraightTiles, maxStraightTiles);
 
-            SpawnTile(startingTile.GetComponent<Tile>());
-            for (int i = 0; i < currentPathLenght; i++)
+            // Spawn the first straight tile without obstacle
+            SpawnTile(startingTile.GetComponent<Tile>(), false);
+
+            for (int i = 1; i < currentPathLength - 1; i++)
             {
-                SpawnTile(RandomGameObjectFromList(straightTiles).GetComponent<Tile>(), (i == 0) ? false : true);
+                SpawnRandomTile();
             }
 
+            // Spawn the last straight tile without obstacle
+            SpawnTile(startingTile.GetComponent<Tile>(), false);
+
+            // Spawn a turn tile
             SpawnTile(RandomGameObjectFromList(turnTiles).GetComponent<Tile>());
         }
 
-        private void SpawnObstacle ()
+        private void SpawnObstacle()
         {
-            if (Random.value > 0.4f) return;
-
             GameObject obstacle = RandomGameObjectFromList(obstacles);
             Quaternion obstacleRotation = obstacle.gameObject.transform.rotation * Quaternion.LookRotation(currentTileDirection, Vector3.up);
             GameObject gameObject = Instantiate(obstacle, currentTileLocation, obstacleRotation);
             currentObstacles.Add(gameObject);
+        }
+
+        private void SpawnGems()
+        {
+            GameObject gem = RandomGameObjectFromList(gems);
+            Quaternion gemRotation = gem.gameObject.transform.rotation * Quaternion.LookRotation(currentTileDirection, Vector3.up);
+
+            GameObject gameObject = Instantiate(gem, currentTileLocation, gemRotation);
+
+            currentGems.Add(gameObject);
         }
 
         private GameObject RandomGameObjectFromList(List<GameObject> list)
@@ -105,6 +167,6 @@ public class TileSpawner : MonoBehaviour
             if (list.Count == 0) return null;
             return list[Random.Range(0, list.Count)];
         }
-}
+    }
 
 }
