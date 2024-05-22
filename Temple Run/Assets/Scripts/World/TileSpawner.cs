@@ -9,6 +9,7 @@ namespace TempleRun
         [SerializeField] private int tilesStart = 7;
         [SerializeField] private int minStraightTiles = 3;
         [SerializeField] private int maxStraightTiles = 15;
+        [SerializeField] private GameObject castleTile;
         [SerializeField] private GameObject startingTile;
         [SerializeField] private List<GameObject> turnTiles;
         [SerializeField] private List<GameObject> obstacles;
@@ -34,7 +35,8 @@ namespace TempleRun
             Random.InitState(System.DateTime.Now.Millisecond);
 
             // Spawn the first straight tile without obstacle
-            for(int i = 0; i < 2; i++) SpawnTile(startingTile.GetComponent<Tile>(), false, false);
+            SpawnTile(castleTile.GetComponent<Tile>(), false, false);
+            for(int i = 0; i < 1; i++) SpawnTile(startingTile.GetComponent<Tile>(), false, false);
 
             for (int i = 1; i < tilesStart - 1; i++)
             {
