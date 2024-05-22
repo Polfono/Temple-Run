@@ -13,7 +13,7 @@ public class GameOver : MonoBehaviour
     {
         //Time.timeScale = 0f;
         distanceText.text = score.ToString();
-        GemsText.text = ControlCoin.coinCount.ToString();
+        GemsText.text = (ControlCoin.coinCount*10).ToString();
         scoreText.text = score + ControlCoin.coinCount * 10 + "";
     }
 
