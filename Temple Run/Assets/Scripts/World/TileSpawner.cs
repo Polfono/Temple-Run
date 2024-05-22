@@ -125,7 +125,8 @@ namespace TempleRun
             {
                 tilePlacementScale = Vector3.Scale((prevTile.GetComponent<Renderer>().bounds.size - (Vector3.one * 2)) + (Vector3.one * startingTile.GetComponent<BoxCollider>().bounds.size.z / 2), currentTileDirection);
             }
-
+            // añade 10 unidades de distancia a tilePlacementScale en la dirección actual
+            tilePlacementScale += Vector3.Scale(Vector3.one * 16, currentTileDirection);
             currentTileLocation += tilePlacementScale;
             int currentPathLength = Random.Range(minStraightTiles, maxStraightTiles);
 

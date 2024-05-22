@@ -600,7 +600,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 188414258}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4800762, y: 0.000000021345993, z: -0.000000011681933, w: 0.8772268}
+  m_LocalRotation: {x: 0.4800762, y: -0.000000021345995, z: 0.000000011681934, w: 0.8772268}
   m_LocalPosition: {x: 0, y: 8, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2555,7 +2555,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4800762, y: 0.000000021345993, z: -0.000000011681933, w: 0.8772268}
+  m_LocalRotation: {x: 0.4800762, y: -0.000000021345995, z: 0.000000011681934, w: 0.8772268}
   m_LocalPosition: {x: 0, y: 8, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3608,8 +3608,6 @@ MonoBehaviour:
   maxStraightTiles: 15
   startingTile: {fileID: 7270030239991754380, guid: daf9416355a2b4241b0d12346881a1a2, type: 3}
   turnTiles:
-  - {fileID: 3504972824814534260, guid: 57a0c77d40fb7f64f88c73e669bd75d0, type: 3}
-  - {fileID: 3109650500946958552, guid: d1bc38dd49605864690bd11be3a4da2a, type: 3}
   - {fileID: 5635246150992067340, guid: 406d087854fa4cf4ba1b09b5571e98e9, type: 3}
   obstacles:
   - {fileID: 7602181854675208719, guid: 155f450bb33de2c4f96d377dba80b194, type: 3}
@@ -3620,9 +3618,9 @@ MonoBehaviour:
   - {fileID: 7270030239991754380, guid: 124d9ec956701a54eb989089df46533a, type: 3}
   - {fileID: 7270030239991754380, guid: 0fc7d9de990801244afd6f3a74041115, type: 3}
   jumps:
-  - {fileID: 7270030239991754380, guid: 5d22edee89397664aa506ed7932cdbe0, type: 3}
   - {fileID: 7270030239991754380, guid: f1e79f4091394d1409cbf707487e120c, type: 3}
   - {fileID: 7270030239991754380, guid: 0329b10eda172e5499dcc239e0aecc60, type: 3}
+  - {fileID: 7270030239991754380, guid: 5d22edee89397664aa506ed7932cdbe0, type: 3}
 --- !u!4 &1457871445
 Transform:
   m_ObjectHideFlags: 0
@@ -4324,7 +4322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69ba3741a35be9f45882e6d900bf89f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPlayerSpeed: 8
+  initialPlayerSpeed: 30
   maxPlayerSpeed: 60
   playerSpeedIncrease: 0.1
   playerJumpHeight: 1.5
