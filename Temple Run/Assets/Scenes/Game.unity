@@ -3709,8 +3709,8 @@ MonoBehaviour:
   - {fileID: 3504972824814534260, guid: 57a0c77d40fb7f64f88c73e669bd75d0, type: 3}
   - {fileID: 3109650500946958552, guid: d1bc38dd49605864690bd11be3a4da2a, type: 3}
   obstacles:
-  - {fileID: 7602181854675208719, guid: 155f450bb33de2c4f96d377dba80b194, type: 3}
-  - {fileID: 1887772381221813489, guid: 7acef6c3f1b5d6f45b162045d394132f, type: 3}
+  - {fileID: 1887772381221813489, guid: 0272f59a69e7f044ebeb2dd9f6b4caba, type: 3}
+  - {fileID: 1887772381221813489, guid: 83107abd78124074880d1e2c50a3b54a, type: 3}
   gems:
   - {fileID: 7270030239991754380, guid: 3d0567be064ac374696201c10a1f8080, type: 3}
   - {fileID: 7270030239991754380, guid: 6ada40b2df448a847ba6cd9587947280, type: 3}
@@ -4717,7 +4717,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2

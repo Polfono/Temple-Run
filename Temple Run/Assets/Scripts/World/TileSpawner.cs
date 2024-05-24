@@ -88,7 +88,7 @@ namespace TempleRun
             else
             {
                 // 80% chance to spawn a straight tile
-                bool spawnObstacle = Random.value <= 0.4f;
+                bool spawnObstacle = Random.value <= 0.99f; // 40% chance to spawn an obstacle
                 SpawnTile(startingTile.GetComponent<Tile>(), spawnObstacle);
             }
         }

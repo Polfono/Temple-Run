@@ -43,10 +43,12 @@ namespace TempleRun.Player
         private int jumpAnimationHash;
         private int dieAnimationHash;
         private int fallAnimationHash;
+        private int tropezarAnimationHash;
         private Animator animator;
         bool transToSlide = false;
         private float score = 0;
         private bool isDead = false;
+        private Rigidbody rb;
 
         [SerializeField] private UnityEvent<Vector3> turnEvent;
         [SerializeField] private UnityEvent<int> gameOverEvent;
@@ -65,9 +67,11 @@ namespace TempleRun.Player
             jumpAnimationHash = Animator.StringToHash("Jump");
             dieAnimationHash = Animator.StringToHash("Die");
             fallAnimationHash = Animator.StringToHash("Falling");
+            tropezarAnimationHash = Animator.StringToHash("Tropiezo");
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
+            rb = GetComponent<Rigidbody>();
 
             originalControllerCenter = characterController.center;
             originalControllerHeight = characterController.height;
@@ -239,6 +243,7 @@ namespace TempleRun.Player
             {
                 Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
                 characterController.Move(leftMovement);
+
             }
             else if (horizontalInput > 0 && canTurn) // mover derecha
             {
@@ -299,6 +304,18 @@ namespace TempleRun.Player
                 _ = GameOver();
             }
             await Task.Delay(0); // Delay for 1 second
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            print(other.gameObject.tag);
+            if (other.gameObject.CompareTag("Raices"))
+            {
+                animator.Play(tropezarAnimationHash);
+                audioSource.pitch = 1.0f;
+                audioSource.clip = tropezarClip;
+                audioSource.Play();
+            }
         }
     }
 
