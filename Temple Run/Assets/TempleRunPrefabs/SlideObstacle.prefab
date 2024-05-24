@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 3473825452370751151}
   - component: {fileID: 5861416215738932958}
   - component: {fileID: 2842373061945102570}
+  - component: {fileID: 7994757246514772627}
   m_Layer: 0
   m_Name: Metal_Barrier_1
-  m_TagString: Untagged
+  m_TagString: restoreZombies
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,6 +107,27 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 3647608817696614495, guid: 1e4f8e3f2cc039646af7633dcde64660, type: 3}
+--- !u!65 &7994757246514772627
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7092489408290997341}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0, y: 1, z: 1.851553}
+  m_Center: {x: -0.37112242, y: 0.5, z: 0.8334755}
 --- !u!1 &7602181853717043545
 GameObject:
   m_ObjectHideFlags: 0

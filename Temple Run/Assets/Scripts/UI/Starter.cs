@@ -26,5 +26,7 @@ public class NewBehaviourScript : MonoBehaviour
             yield return new WaitForSeconds(1);
             countDown[i].SetActive(false);
         }
+        GameObject zombies = GameObject.Find("Zombie");
+        zombies.GetComponent<EnemyFollow>().Alejar();
     }
 }

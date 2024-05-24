@@ -2690,6 +2690,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 1688702055}
   followDistance: 4
+  zombie1: {fileID: 1028992023}
+  zombie2: {fileID: 271035542}
+  zombie3: {fileID: 2084930742}
 --- !u!95 &1028992023
 Animator:
   serializedVersion: 5
@@ -3711,6 +3714,8 @@ MonoBehaviour:
   obstacles:
   - {fileID: 1887772381221813489, guid: 0272f59a69e7f044ebeb2dd9f6b4caba, type: 3}
   - {fileID: 1887772381221813489, guid: 83107abd78124074880d1e2c50a3b54a, type: 3}
+  - {fileID: 1887772381221813489, guid: 7acef6c3f1b5d6f45b162045d394132f, type: 3}
+  - {fileID: 7602181854675208719, guid: 155f450bb33de2c4f96d377dba80b194, type: 3}
   gems:
   - {fileID: 7270030239991754380, guid: 3d0567be064ac374696201c10a1f8080, type: 3}
   - {fileID: 7270030239991754380, guid: 6ada40b2df448a847ba6cd9587947280, type: 3}
@@ -4443,6 +4448,7 @@ MonoBehaviour:
   tropezarClip: {fileID: 8300000, guid: ba1a744247600384cb180e5cdd83618f, type: 3}
   jumpClip: {fileID: 8300000, guid: d52383a5826da8944a893ed543341ad2, type: 3}
   slideClip: {fileID: 8300000, guid: ef4131fe280dc1b4d90a9aa71cc65123, type: 3}
+  zombieClip: {fileID: 8300000, guid: 0185f01deb414e541a0c9539b1c432c6, type: 3}
   turnEvent:
     m_PersistentCalls:
       m_Calls:
@@ -4618,7 +4624,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.3
+  m_Volume: 0.5
   m_Pitch: 1.77
   Loop: 0
   Mute: 0

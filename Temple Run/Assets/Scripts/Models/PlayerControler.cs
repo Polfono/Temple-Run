@@ -28,6 +28,7 @@ namespace TempleRun.Player
         [SerializeField] private AudioClip tropezarClip;
         [SerializeField] private AudioClip jumpClip;
         [SerializeField] private AudioClip slideClip;
+        [SerializeField] private AudioClip zombieClip;
 
         private float playerSpeed;
         private float playerGravity;
@@ -44,10 +45,12 @@ namespace TempleRun.Player
         private int dieAnimationHash;
         private int fallAnimationHash;
         private int tropezarAnimationHash;
+        private int zombieDieAnimationHash;
         private Animator animator;
         bool transToSlide = false;
         private float score = 0;
         private bool isDead = false;
+        private bool zombiesNear = false;
         private Rigidbody rb;
 
         [SerializeField] private UnityEvent<Vector3> turnEvent;
@@ -68,6 +71,7 @@ namespace TempleRun.Player
             dieAnimationHash = Animator.StringToHash("Die");
             fallAnimationHash = Animator.StringToHash("Falling");
             tropezarAnimationHash = Animator.StringToHash("Tropiezo");
+            zombieDieAnimationHash = Animator.StringToHash("zombieDie");
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
@@ -176,9 +180,7 @@ namespace TempleRun.Player
         {
             audioSource.clip = slideClip;
             audioSource.pitch = 1.3f;
-            audioSource.volume = 0.2f;
             audioSource.Play();
-            audioSource.volume = 0.3f;
             sliding = true;
 
             // Collider mas pequeño
@@ -201,6 +203,23 @@ namespace TempleRun.Player
 
         private void Update()
         {
+            if (isGrounded() && playerVelocity.y < 0)
+            {
+                playerVelocity.y = 0f;
+                if (transToSlide)
+                {
+                    StartCoroutine(Slide());
+                    transToSlide = false;
+                    playerGravity = initialGravity;
+                }
+            }
+
+            playerVelocity.y += playerGravity * Time.deltaTime;
+            // only if controller active
+            if (characterController.enabled) characterController.Move(playerVelocity * Time.deltaTime);
+
+            if (isDead) return;
+
             // si el jugador esta a menos de 0 de altura game over
             if (transform.position.y < 0)
             {
@@ -217,26 +236,13 @@ namespace TempleRun.Player
             }
 
             // Score Update
-            if (!isDead) score += 10 * Time.deltaTime;
+            score += 10 * Time.deltaTime;
             scoreUpdateEvent.Invoke((int)score);
 
 
             characterController.Move(transform.forward * playerSpeed * Time.deltaTime);
 
-            if (isGrounded() && playerVelocity.y < 0)
-            {
-                playerVelocity.y = 0f;
-                if (transToSlide)
-                {
-                    StartCoroutine(Slide());
-                    transToSlide = false;
-                    playerGravity = initialGravity;
-                }
-            }
-
-            playerVelocity.y += playerGravity * Time.deltaTime;
-            // only if controller active
-            if (characterController.enabled) characterController.Move(playerVelocity * Time.deltaTime);
+            
 
             float horizontalInput = PlayerInput.actions["Turn"].ReadValue<float>();
             if (horizontalInput < 0 && canTurn) // mover izquierda
@@ -277,14 +283,27 @@ namespace TempleRun.Player
             return false;
         }
 
-        private async Task GameOver()
+        private async Task GameOver(bool byZombies = false)
         {
-         
-            animator.Play(dieAnimationHash);
+            if (byZombies) animator.Play(zombieDieAnimationHash);
+            else animator.Play(dieAnimationHash);
+
+            if(zombiesNear && !byZombies)
+            {
+                GameObject zombies = GameObject.Find("Zombie");
+                zombies.GetComponent<EnemyFollow>().AtacarAnimacion();
+            }
+
             if (!isDead) {
-                audioSource.pitch = 1.0f;
-                audioSource.clip = dieClip;
-                audioSource.Play();
+                if(byZombies) {
+                    
+                }
+                else
+                {
+                    audioSource.pitch = 1.0f;
+                    audioSource.clip = dieClip;
+                    audioSource.Play();
+                }
             } 
 
             // stop updating score and speed = 0 and stop getting input
@@ -308,13 +327,41 @@ namespace TempleRun.Player
 
         private void OnTriggerEnter(Collider other)
         {
-            print(other.gameObject.tag);
             if (other.gameObject.CompareTag("Raices"))
             {
                 animator.Play(tropezarAnimationHash);
-                audioSource.pitch = 1.0f;
+                audioSource.pitch = 1.5f;
                 audioSource.clip = tropezarClip;
                 audioSource.Play();
+
+                if (!zombiesNear)
+                {
+                    GameObject zombies = GameObject.Find("Zombie");
+                    zombies.GetComponent<EnemyFollow>().Acercar();
+
+                    audioSource.pitch = 1.0f;
+                    audioSource.clip = zombieClip;
+                    audioSource.Play();
+
+                    // reducir un 10% la velocidad
+                    playerSpeed -= playerSpeed * 0.1f;
+
+                    zombiesNear = true;
+                }
+                else
+                {
+                    GameObject zombies = GameObject.Find("Zombie");
+                    zombies.GetComponent<EnemyFollow>().Comer();
+
+                    _ = GameOver(true);
+                    return;
+                }
+            }
+            else if(other.gameObject.CompareTag("restoreZombies"))
+            {
+                GameObject zombies = GameObject.Find("Zombie");
+                zombies.GetComponent<EnemyFollow>().Alejar();
+                zombiesNear = false;
             }
         }
     }
