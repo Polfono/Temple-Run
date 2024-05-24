@@ -52,6 +52,9 @@ namespace TempleRun.Player
         [SerializeField] private UnityEvent<int> gameOverEvent;
         [SerializeField] private UnityEvent<int> scoreUpdateEvent;
 
+        private Vector3 originalControllerCenter;
+        private float originalControllerHeight;
+
         private void Awake()
         {
             PlayerInput = GetComponent<PlayerInput>();
@@ -65,6 +68,9 @@ namespace TempleRun.Player
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
+
+            originalControllerCenter = characterController.center;
+            originalControllerHeight = characterController.height;
         }
 
         private void OnEnable()
@@ -141,7 +147,11 @@ namespace TempleRun.Player
                 playerVelocity.y = Mathf.Sqrt(playerJumpHeight * -3f * playerGravity);
                 characterController.Move(playerVelocity * Time.deltaTime);
 
-                if (sliding) sliding = false;
+                if (sliding) {
+                    characterController.height = originalControllerHeight;
+                    characterController.center = originalControllerCenter;
+                    sliding = false;
+                } 
             }
         }
 
@@ -166,6 +176,7 @@ namespace TempleRun.Player
             audioSource.Play();
             audioSource.volume = 0.3f;
             sliding = true;
+
             // Collider mas pequeño
             Vector3 originalControllerCenter = characterController.center;
             Vector3 newControllerCenter = originalControllerCenter;
@@ -174,10 +185,12 @@ namespace TempleRun.Player
             characterController.center = newControllerCenter;
 
             animator.Play(slideAnimationHash);
-            yield return new WaitForSeconds(slideAnimation.length);
+            // restart animation if already playing
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Slide")) animator.Play(slideAnimationHash, 0, 0f);
+            yield return new WaitForSeconds(slideAnimation.length - 0.6f);
 
             // Collider normal
-            characterController.height *= 2;
+            characterController.height = originalControllerHeight;
             characterController.center = originalControllerCenter;
             sliding = false;
         }
