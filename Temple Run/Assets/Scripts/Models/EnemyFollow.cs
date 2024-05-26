@@ -4,27 +4,42 @@ using UnityEngine;
 
 public class EnemyFollow : MonoBehaviour
 {
-    public GameObject Player;  // Referencia al jugador
-    public float followDistance = 8.0f; // Distancia a la que el enemigo seguirá al jugador
+    public GameObject Player;  // Reference to the player
+    public float followDistance = 8.0f; // Distance at which the enemy will follow the player
+    public float smoothSpeed = 0.125f; // Velocidad de suavizado del movimiento
 
-    private bool isFollowing = true; // Bandera para controlar si el enemigo sigue al jugador
+    private bool isFollowing = true; // Flag to control if the enemy is following the player
 
-    [SerializeField] private Animator zombie1; // Referencia al primer zombie
-    [SerializeField] private Animator zombie2; // Referencia al segundo zombie
-    [SerializeField] private Animator zombie3;
+    [SerializeField] private Animator zombie; // Reference to the first zombie
+
+    private Queue<Vector3> playerPositions = new Queue<Vector3>(); // Queue to store player's positions
+    private float positionInterval = 0.001f; // Time interval between position records
+    private float nextPositionTime = 0.0f; // Time to record the next position
 
     void Update()
     {
         if (isFollowing)
         {
-            // Calcula la dirección hacia el jugador
-            Vector3 dir = (Player.transform.position - transform.position).normalized;
+            // Registrar la posición del jugador a intervalos
+            if (Time.time >= nextPositionTime)
+            {
+                playerPositions.Enqueue(Player.transform.position);
+                nextPositionTime = Time.time + positionInterval;
+            }
 
-            // Mueve al enemigo a la posición del jugador menos la distancia de seguimiento
-            transform.position = Player.transform.position - dir * followDistance;
+            // Mantener la distancia de seguimiento eliminando posiciones antiguas
+            while (playerPositions.Count > 0 && Vector3.Distance(playerPositions.Peek(), Player.transform.position) > followDistance)
+            {
+                playerPositions.Dequeue();
+            }
 
-            // Hace que el enemigo mire hacia el jugador
-            transform.LookAt(Player.transform);
+            // Mover al enemigo a la posición más antigua registrada
+            if (playerPositions.Count > 0)
+            {
+                Vector3 targetPosition = playerPositions.Peek();
+                transform.position = Vector3.Lerp(transform.position, targetPosition, smoothSpeed);
+                transform.LookAt(Player.transform);
+            }
         }
     }
 
@@ -35,17 +50,17 @@ public class EnemyFollow : MonoBehaviour
 
     public void Alejar()
     {
-        StartCoroutine(TransitionDistance(10.0f, 1.5f));
+        StartCoroutine(TransitionDistance(12.0f, 1.5f));
     }
 
     public void Comer()
     {
-        // Dejar de seguir al jugador
-        StopAllCoroutines(); // Detiene cualquier corrutina en ejecución, incluyendo el seguimiento del jugador
-        isFollowing = false; // Marca que el enemigo ya no debe seguir al jugador
+        // Stop following the player
+        StopAllCoroutines(); // Stop any running coroutines
+        isFollowing = false; // Mark that the enemy should no longer follow the player
 
-        // Iniciar la corrutina para avanzar 5 unidades hacia adelante
-        StartCoroutine(Advance(11.0f, 1.0f)); // 1.0f es la duración de la transición
+        // Start the coroutine to move forward 11 units
+        StartCoroutine(Advance(11.0f, 1.0f)); // 1.0f is the duration of the transition
     }
 
     private IEnumerator TransitionDistance(float targetDistance, float duration)
@@ -65,9 +80,7 @@ public class EnemyFollow : MonoBehaviour
 
     public void AtacarAnimacion()
     {
-        zombie1.Play("zombieAttack");
-        zombie2.Play("zombieAttack");
-        zombie3.Play("zombieAttack");
+        zombie.Play("zombieAttack");
     }
 
     private IEnumerator Advance(float distance, float duration)
