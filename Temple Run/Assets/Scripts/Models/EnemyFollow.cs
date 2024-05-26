@@ -23,13 +23,26 @@ public class EnemyFollow : MonoBehaviour
             // Registrar la posición del jugador a intervalos
             if (Time.time >= nextPositionTime)
             {
-                playerPositions.Enqueue(Player.transform.position);
+                Vector3 playerPosition = Player.transform.position;
+                playerPosition.y = 0; // Ignorar la componente y
+                playerPositions.Enqueue(playerPosition);
                 nextPositionTime = Time.time + positionInterval;
             }
 
             // Mantener la distancia de seguimiento eliminando posiciones antiguas
-            while (playerPositions.Count > 0 && Vector3.Distance(playerPositions.Peek(), Player.transform.position) > followDistance)
+            while (playerPositions.Count > 0)
             {
+                Vector3 playerPosition = playerPositions.Peek();
+                playerPosition.y = 0; // Ignorar la componente y
+
+                Vector3 currentPosition = Player.transform.position;
+                currentPosition.y = 0; // Ignorar la componente y
+
+                if (Vector3.Distance(playerPosition, currentPosition) <= followDistance)
+                {
+                    break;
+                }
+
                 playerPositions.Dequeue();
             }
 
@@ -37,11 +50,15 @@ public class EnemyFollow : MonoBehaviour
             if (playerPositions.Count > 0)
             {
                 Vector3 targetPosition = playerPositions.Peek();
+                targetPosition.y = transform.position.y; // Mantener la componente y actual del enemigo
+
                 transform.position = Vector3.Lerp(transform.position, targetPosition, smoothSpeed);
-                transform.LookAt(Player.transform);
+                transform.LookAt(new Vector3(Player.transform.position.x, transform.position.y, Player.transform.position.z)); // Ignorar la componente y al mirar
             }
         }
     }
+
+
 
     public void Acercar()
     {
