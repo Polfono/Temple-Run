@@ -216,7 +216,7 @@ namespace TempleRun.Player
 
             playerVelocity.y += playerGravity * Time.deltaTime;
             // only if controller active
-            if (characterController.enabled) characterController.Move(playerVelocity * Time.deltaTime);
+            if (characterController.enabled && transform.position.y > -10.3f) characterController.Move(playerVelocity * Time.deltaTime);
 
             if (isDead) return;
 
