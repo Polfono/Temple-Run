@@ -149,7 +149,7 @@ namespace TempleRun.Player
 
         private void PlayerJump(InputAction.CallbackContext context)
         {
-            if (isGrounded() && !godMode)
+            if ((isGrounded() || sliding) && !godMode)
             {
                 audioSource.clip = jumpClip;
                 audioSource.pitch = 1.0f;

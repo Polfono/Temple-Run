@@ -8288,11 +8288,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Escape from the zombie\n\nTo do so, you will need to move left and right,
-    jump, and slide to avoid obstacles\n\nTo survive, move left and right, jump,
-    and slide to avoid obstacles. When you reach a fork in the path, choose to go
-    left or right\n\n GAim for a high score by surviving as long as possible and
-    collecting gems along the way
+  m_text: "Escape from the zombie\\n\\nTo survive, move left and right, jump, and
+    slide to avoid obstacles. When you reach a fork in the path, choose to go left
+    or right  \u2190 \u2191 \u2192 \u2193 / WASD / SPACE BAR\\n\\nAim for a high
+    score by surviving as long as possible and collecting gems along the way"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 16cebc3d99fae664f805b2bb69669a06, type: 2}
   m_sharedMaterial: {fileID: 2129782178388540817, guid: 16cebc3d99fae664f805b2bb69669a06, type: 2}
@@ -8319,8 +8318,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 8
-  m_fontSizeBase: 8
+  m_fontSize: 9
+  m_fontSizeBase: 9
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
