@@ -771,7 +771,7 @@ Transform:
   m_GameObject: {fileID: 427979372980314285}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0.7071068, z: -0, w: 0}
-  m_LocalPosition: {x: 1.8, y: 1.92, z: -5.04}
+  m_LocalPosition: {x: 1.94, y: 1.92, z: -5.04}
   m_LocalScale: {x: 1, y: 1, z: 1.383}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11888,7 +11888,7 @@ GameObject:
   - component: {fileID: 3341987877426231989}
   - component: {fileID: 7709597924023028516}
   m_Layer: 6
-  m_Name: Right
+  m_Name: auxRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13795,10 +13795,9 @@ GameObject:
   - component: {fileID: 5065468548954246276}
   - component: {fileID: 7957045309347019459}
   - component: {fileID: 5943756449523151064}
-  - component: {fileID: 8105553764239709195}
   m_Layer: 0
   m_Name: Tower A (1)
-  m_TagString: turnRight
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20690,27 +20689,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!65 &8105553764239709195
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5499332303594699865}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 4, z: 0}
-  m_Center: {x: 0, y: 0, z: -1}
 --- !u!1 &5784827172036573390
 GameObject:
   m_ObjectHideFlags: 0

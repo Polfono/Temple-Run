@@ -25327,7 +25327,7 @@ GameObject:
   - component: {fileID: 4163924903548961238}
   - component: {fileID: 5341697770862133703}
   m_Layer: 6
-  m_Name: Sideways
+  m_Name: auxSideways
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26414,7 +26414,7 @@ GameObject:
   - component: {fileID: 5950380368070854024}
   - component: {fileID: 8452565641706066798}
   - component: {fileID: 3398529915313946267}
-  - component: {fileID: 6416225699962190298}
+  - component: {fileID: 4974257964759720271}
   m_Layer: 0
   m_Name: Tower A
   m_TagString: turn
@@ -33309,7 +33309,7 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!65 &6416225699962190298
+--- !u!65 &4974257964759720271
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

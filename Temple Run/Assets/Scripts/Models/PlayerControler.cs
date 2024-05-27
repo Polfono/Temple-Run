@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using System.Threading.Tasks;
 using UnityEditor;
+using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 
 namespace TempleRun.Player
@@ -29,6 +30,7 @@ namespace TempleRun.Player
         [SerializeField] private AudioClip jumpClip;
         [SerializeField] private AudioClip slideClip;
         [SerializeField] private AudioClip zombieClip;
+        [SerializeField] private GameObject godModeTxt;
 
         private float playerSpeed;
         private float playerGravity;
@@ -38,6 +40,7 @@ namespace TempleRun.Player
         private InputAction turnAction;
         private InputAction jumpAction;
         private InputAction slideAction;
+        private InputAction godAction;
         private CharacterController characterController;
         private bool sliding = false;
         private int slideAnimationHash;
@@ -51,7 +54,7 @@ namespace TempleRun.Player
         private float score = 0;
         private bool isDead = false;
         private bool zombiesNear = false;
-        private Rigidbody rb;
+        private bool godMode = false;
 
         [SerializeField] private UnityEvent<Vector3> turnEvent;
         [SerializeField] private UnityEvent<int> gameOverEvent;
@@ -75,7 +78,7 @@ namespace TempleRun.Player
             turnAction = PlayerInput.actions["Turn"];
             jumpAction = PlayerInput.actions["Jump"];
             slideAction = PlayerInput.actions["Slide"];
-            rb = GetComponent<Rigidbody>();
+            godAction = PlayerInput.actions["God"];
 
             originalControllerCenter = characterController.center;
             originalControllerHeight = characterController.height;
@@ -146,7 +149,7 @@ namespace TempleRun.Player
 
         private void PlayerJump(InputAction.CallbackContext context)
         {
-            if (isGrounded() || sliding)
+            if (isGrounded() && !godMode)
             {
                 audioSource.clip = jumpClip;
                 audioSource.pitch = 1.0f;
@@ -165,11 +168,11 @@ namespace TempleRun.Player
 
         private void PlayerSlide(InputAction.CallbackContext context)
         {
-            if (!sliding && isGrounded())
+            if (!sliding && isGrounded() && !godMode)
             {
                 StartCoroutine(Slide());
             }
-            else if(!sliding)
+            else if(!sliding && !godMode)
             {
                 playerGravity = initialGravity * 10f;
                 transToSlide = true;
@@ -203,6 +206,21 @@ namespace TempleRun.Player
 
         private void Update()
         {
+            // si se pulsa la tecla godmode
+            if (godAction.triggered)
+            {
+                godMode = !godMode;
+                if (godMode)
+                {
+                    playerSpeed = 16f;
+                    godModeTxt.SetActive(true);
+                }
+                else
+                {
+                    godModeTxt.SetActive(false);
+                }
+            }   
+
             if (isGrounded() && playerVelocity.y < 0)
             {
                 playerVelocity.y = 0f;
@@ -245,19 +263,19 @@ namespace TempleRun.Player
             
 
             float horizontalInput = PlayerInput.actions["Turn"].ReadValue<float>();
-            if (horizontalInput < 0 && canTurn) // mover izquierda
+            if (horizontalInput < 0 && canTurn && !godMode) // mover izquierda
             {
                 Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
                 characterController.Move(leftMovement);
 
             }
-            else if (horizontalInput > 0 && canTurn) // mover derecha
+            else if (horizontalInput > 0 && canTurn && !godMode) // mover derecha
             {
                 Vector3 rightMovement = transform.right * 0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the right
                 characterController.Move(rightMovement);
             }
 
-            if (playerSpeed < maxPlayerSpeed)
+            if (playerSpeed < maxPlayerSpeed && !godMode)
             {
                 playerSpeed += playerSpeedIncrease * Time.deltaTime;
             }
@@ -357,13 +375,141 @@ namespace TempleRun.Player
                     return;
                 }
             }
-            else if(other.gameObject.CompareTag("restoreZombies"))
+            else if (other.gameObject.CompareTag("restoreZombies"))
             {
                 GameObject zombies = GameObject.Find("Zombie");
                 zombies.GetComponent<EnemyFollow>().Alejar();
                 zombiesNear = false;
             }
+            else if (godMode)
+            {
+                if (other.gameObject.CompareTag("jump"))
+                {
+                    audioSource.clip = jumpClip;
+                    audioSource.pitch = 1.0f;
+                    audioSource.Play();
+                    animator.Play(jumpAnimationHash);
+                    playerVelocity.y = Mathf.Sqrt(playerJumpHeight * -3f * playerGravity);
+                    characterController.Move(playerVelocity * Time.deltaTime);
+
+                    if (sliding)
+                    {
+                        characterController.height = originalControllerHeight;
+                        characterController.center = originalControllerCenter;
+                        sliding = false;
+                    }
+                }
+                else if (other.gameObject.CompareTag("slide"))
+                {
+                    if (!sliding && isGrounded())
+                    {
+                        StartCoroutine(Slide());
+                    }
+                    else if (!sliding)
+                    {
+                        playerGravity = initialGravity * 10f;
+                        transToSlide = true;
+                    }
+                }
+                else if (other.gameObject.CompareTag("right"))
+                {
+                    StartCoroutine(moverDerecha(0.2f));
+                }
+                else if(other.gameObject.CompareTag("left"))
+                {
+                    StartCoroutine(moverIzquierda(0.2f));
+                }
+                else if(other.gameObject.CompareTag("strLeft"))
+                {
+                    StartCoroutine(moverIzquierda(1.8f));
+                }
+                else if(other.gameObject.CompareTag("strRight"))
+                {
+                    StartCoroutine(moverDerecha(1.8f));
+                }
+                else if(other.gameObject.CompareTag("turnLeft"))
+                {
+                    Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1f, turnLayer);
+                    Tile tile = hitColliders[0].transform.parent.GetComponent<Tile>();
+                    Vector3 turnPos = tile.pivot.position;
+
+                    Vector3 targetDirection = Quaternion.AngleAxis(90 * -1, Vector3.up) * playerDirection;
+                    turnEvent.Invoke(targetDirection);
+                    Turn(-1, turnPos);
+
+                    StartCoroutine(ResetTurnCooldown());
+                }
+                else if(other.gameObject.CompareTag("turnRight"))
+                {
+                    Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1f, turnLayer);
+                    Tile tile = hitColliders[0].transform.parent.GetComponent<Tile>();
+                    Vector3 turnPos = tile.pivot.position;
+
+                    Vector3 targetDirection = Quaternion.AngleAxis(90 * 1, Vector3.up) * playerDirection;
+                    turnEvent.Invoke(targetDirection);
+                    Turn(1, turnPos);
+                }
+                else if(other.gameObject.CompareTag("turn"))
+                {
+                    //random left or right random
+                    int random = Random.Range(0, 2);
+                    if(random == 0)
+                    {
+                        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1f, turnLayer);
+                        Tile tile = hitColliders[0].transform.parent.GetComponent<Tile>();
+                        Vector3 turnPos = tile.pivot.position;
+
+                        Vector3 targetDirection = Quaternion.AngleAxis(90 * -1, Vector3.up) * playerDirection;
+                        turnEvent.Invoke(targetDirection);
+                        Turn(-1, turnPos);
+                    }
+                    else
+                    {
+                        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 1f, turnLayer);
+                        Tile tile = hitColliders[0].transform.parent.GetComponent<Tile>();
+                        Vector3 turnPos = tile.pivot.position;
+
+                        Vector3 targetDirection = Quaternion.AngleAxis(90 * 1, Vector3.up) * playerDirection;
+                        turnEvent.Invoke(targetDirection);
+                        Turn(1, turnPos);
+                    }
+                }
+            }
         }
+        IEnumerator moverDerecha(float wait)
+        {
+            for(int i = 0; i < 120; i++)
+            {
+                Vector3 rightMovement = transform.right * 0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the right
+                characterController.Move(rightMovement);
+                yield return new WaitForSeconds(0.005f);
+            }
+            yield return new WaitForSeconds(wait);
+            for(int i = 0; i < 60; i++)
+            {
+                Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
+                characterController.Move(leftMovement);
+                yield return new WaitForSeconds(0.005f);
+            }
+        }
+
+        IEnumerator moverIzquierda(float wait)
+        {
+            for(int i = 0; i < 120; i++)
+            {
+                Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
+                characterController.Move(leftMovement);
+                yield return new WaitForSeconds(0.005f);
+            }
+            yield return new WaitForSeconds(wait);
+            for(int i = 0; i < 60; i++)
+            {
+                Vector3 rightMovement = transform.right * 0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the right
+                characterController.Move(rightMovement);
+                yield return new WaitForSeconds(0.005f);
+            }
+        }
+
     }
 
 }

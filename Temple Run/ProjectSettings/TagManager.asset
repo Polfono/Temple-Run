@@ -6,6 +6,15 @@ TagManager:
   tags:
   - Raices
   - restoreZombies
+  - jump
+  - slide
+  - right
+  - left
+  - strLeft
+  - strRight
+  - turnLeft
+  - turnRight
+  - turn
   layers:
   - Default
   - TransparentFX

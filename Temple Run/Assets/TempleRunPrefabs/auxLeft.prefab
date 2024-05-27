@@ -6416,7 +6416,7 @@ Transform:
   m_GameObject: {fileID: 1402969449045567286}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -1.8, y: 1.92, z: -4.9400015}
+  m_LocalPosition: {x: -1.9400005, y: 1.92, z: -4.9400015}
   m_LocalScale: {x: 1, y: 1, z: 1.383}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6456,7 +6456,7 @@ GameObject:
   - component: {fileID: 1035743068412607735}
   - component: {fileID: 2630224588067333176}
   - component: {fileID: 1630735790392096652}
-  - component: {fileID: 5115034307283413288}
+  - component: {fileID: 6341784457914529441}
   m_Layer: 0
   m_Name: Tower A (1)
   m_TagString: turnLeft
@@ -6473,7 +6473,7 @@ Transform:
   m_GameObject: {fileID: 1547814000182387608}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.34, y: 5, z: -0.2}
+  m_LocalPosition: {x: -4.23, y: 5, z: -0.2}
   m_LocalScale: {x: 4.6, y: 4.6, z: 4.6}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -13351,7 +13351,7 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!65 &5115034307283413288
+--- !u!65 &6341784457914529441
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -13401,7 +13401,7 @@ Transform:
   m_GameObject: {fileID: 2004837428468049303}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3, y: 10, z: 4.26}
+  m_LocalPosition: {x: 0.38, y: 10, z: 4.26}
   m_LocalScale: {x: 4.6, y: 4.6, z: 4.6}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -23331,7 +23331,7 @@ GameObject:
   - component: {fileID: 8997136381197051915}
   - component: {fileID: 54947653135122987}
   m_Layer: 6
-  m_Name: Left
+  m_Name: auxLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

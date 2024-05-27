@@ -6383,9 +6383,10 @@ GameObject:
   - component: {fileID: 7418254030628999326}
   - component: {fileID: 5726498178971717387}
   - component: {fileID: 5680116188410879156}
+  - component: {fileID: 3659856905451381078}
   m_Layer: 6
   m_Name: Jump
-  m_TagString: Untagged
+  m_TagString: jump
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6692,6 +6693,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 4
   pivot: {fileID: 0}
+--- !u!65 &3659856905451381078
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7270030239991754380}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 8, z: 0}
+  m_Center: {x: 0, y: 4, z: -8.5}
 --- !u!1 &7326908125119029026
 GameObject:
   m_ObjectHideFlags: 0
