@@ -102,6 +102,10 @@ namespace TempleRun
                 Destroy(tile);
             }
 
+            // set active false to the child named "Cloud" of the first tile
+            GameObject cloud = currentTiles[0].transform.Find("Cloud").gameObject;
+            cloud.SetActive(false);
+
             foreach (GameObject obstacle in currentObstacles)
             {
                 Destroy(obstacle);

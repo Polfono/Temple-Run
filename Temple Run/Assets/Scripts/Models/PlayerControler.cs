@@ -484,13 +484,13 @@ namespace TempleRun.Player
                 characterController.Move(rightMovement);
                 yield return new WaitForSeconds(0.005f);
             }
-            yield return new WaitForSeconds(wait);
-            for(int i = 0; i < 60; i++)
+            /*yield return new WaitForSeconds(wait);
+            for(int i = 0; i < 55; i++)
             {
                 Vector3 leftMovement = transform.right * -0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the left
                 characterController.Move(leftMovement);
                 yield return new WaitForSeconds(0.005f);
-            }
+            }*/
         }
 
         IEnumerator moverIzquierda(float wait)
@@ -501,13 +501,13 @@ namespace TempleRun.Player
                 characterController.Move(leftMovement);
                 yield return new WaitForSeconds(0.005f);
             }
-            yield return new WaitForSeconds(wait);
-            for(int i = 0; i < 60; i++)
+            /*yield return new WaitForSeconds(wait);
+            for(int i = 0; i < 55; i++)
             {
                 Vector3 rightMovement = transform.right * 0.5f * playerSpeed * Time.deltaTime; // Move half as fast to the right
                 characterController.Move(rightMovement);
                 yield return new WaitForSeconds(0.005f);
-            }
+            }*/
         }
 
     }
